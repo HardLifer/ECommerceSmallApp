@@ -2,7 +2,7 @@
 using ECommerce.Core.Models;
 namespace ECommerce.Infrastructure.Seeder
 {
-    internal static class ProductSeeder
+    public static class ProductSeeder
     {
         public static IEnumerable<Product> Seed(int countOfProdutsToGenerate)
         {

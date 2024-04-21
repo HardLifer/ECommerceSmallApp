@@ -23,6 +23,9 @@ namespace ECommerce.Services.Concrete
 
             await using var dbContext = await _productContextFactory.CreateDbContextAsync();
 
+            product.CreatedDate = DateTime.Now;
+
+
             var addedProduct = await dbContext.Products.AddAsync(product);
 
             await dbContext.SaveChangesAsync();

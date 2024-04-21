@@ -2,6 +2,7 @@
 using ECommerce.Services.Interfaces;
 using ECommerceSimpleAPI.DTOs;
 using ECommerceSimpleAPI.Models;
+using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 
@@ -14,10 +15,15 @@ namespace ECommerceSimpleAPI.Controllers
         private readonly ILogger<ProductController> _logger;
         private readonly IProductService _productService;
 
-        public ProductController(ILogger<ProductController> logger, IProductService productService)
+        private readonly IValidator<PaginationSettings> _paginationValidator;
+        private readonly IValidator<ProductDTO> _productValidator;
+
+        public ProductController(ILogger<ProductController> logger, IProductService productService, IValidator<PaginationSettings> paginationValidator, IValidator<ProductDTO> productValidator)
         {
             _logger = logger;
             _productService = productService;
+            _paginationValidator = paginationValidator;
+            _productValidator = productValidator;
         }
 
         [HttpGet("getproductbyid")]
@@ -50,10 +56,17 @@ namespace ECommerceSimpleAPI.Controllers
         [HttpGet("getproducts")]
         [ProducesResponseType(typeof(List<Product>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        public async Task<IActionResult> GetProducts(PaginationSettings paginationSettings)
+        public async Task<IActionResult> GetProducts([FromQuery]PaginationSettings paginationSettings)
         {
             try
             {
+                var validationResults = await _paginationValidator.ValidateAsync(paginationSettings);
+
+                if (!validationResults.IsValid)
+                {                    
+                    return BadRequest(validationResults.ToString());
+                }
+
                 var result = await _productService.GetProductsAsync(paginationSettings.PageNumber, paginationSettings.PageSize);
 
                 return Ok(result);
@@ -73,12 +86,21 @@ namespace ECommerceSimpleAPI.Controllers
         {
             try
             {
+                var validationResults = await _productValidator.ValidateAsync(productDto);
+
+                if (!validationResults.IsValid)
+                {
+                    return BadRequest(validationResults.ToString());
+                }
+
                 var product = new Product
                 {
                     Description = productDto.Description,
                     Name = productDto.Name,
                     Price = productDto.Price,
                     Quantity = productDto.Quantity,
+                    CreatedDate = DateTime.UtcNow,
+                    ModifiedDate = DateTime.UtcNow
                 };
 
                 var result = await _productService.CreateProductAsync(product);
@@ -101,6 +123,13 @@ namespace ECommerceSimpleAPI.Controllers
         {
             try
             {
+                var validationResults = await _productValidator.ValidateAsync(productDto);
+
+                if (!validationResults.IsValid)
+                {
+                    return BadRequest(validationResults.ToString());
+                }
+
                 var product = new Product
                 {
                     Description = productDto.Description,
