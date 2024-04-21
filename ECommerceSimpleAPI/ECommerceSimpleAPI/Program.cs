@@ -1,4 +1,6 @@
 
+using ECommerceSimpleAPI.DependencyInjection;
+
 namespace ECommerceSimpleAPI
 {
     public class Program
@@ -17,7 +19,11 @@ namespace ECommerceSimpleAPI
             // Server Registration
             // Global Exception Handling
             // Validators
+            builder.Services.AddValidators();
             // Configs
+            builder.Services.AddProductContext(builder.Configuration);
+            // Services
+            builder.Services.AddProductServices();
 
             var app = builder.Build();
 

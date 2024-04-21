@@ -1,10 +1,6 @@
 ﻿using ECommerce.Core.Models;
+using ECommerce.Infrastructure.Seeder;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ECommerce.Infrastructure.Context
 {
@@ -23,6 +19,7 @@ namespace ECommerce.Infrastructure.Context
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Product>().HasData(ProductSeeder.Seed(countOfProdutsToGenerate: 50));
             // model configuration
         }
     }

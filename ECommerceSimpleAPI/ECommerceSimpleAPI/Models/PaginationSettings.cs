@@ -1,6 +1,6 @@
 ﻿namespace ECommerceSimpleAPI.Models;
 
-internal class PaginationSettings
+public class PaginationSettings
 {
     public int PageSize { get; set; }
 
